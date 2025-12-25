@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz Navidad</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #8B0000; /* Rojo oscuro sólido */
+            color: #000000; /* Texto en negro */
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        /* Árbol de fondo dinámico (construcción paso a paso) */
+        .background-tree {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1; /* Detrás de todo */
+            width: 200px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centra horizontalmente todas las partes */
+        }
+        /* Tronco */
+        .trunk {
+            width: 30px;
+            height: 50px;
+            background: #8B4513; /* Marrón */
+            opacity: 0;
+            animation: appear 1s ease-in-out 0s forwards;
+        }
+        /* Ramas (capas triangulares, centradas) */
+        .branch {
+            background: linear-gradient(to bottom, #228B22, #006400); /* Verde */
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            opacity: 0;
+        }
+        .branch1 { /* Rama inferior */
+            width: 180px;
+            height: 80px;
+            animation: appear 1s ease-in-out 1s forwards;
+        }
+        .branch2 {
+            width: 160px;
+            height: 70px;
+            animation: appear 1s ease-in-out 2s forwards;
+        }
+        .branch3 {
+            width: 140px;
+            height: 60px;
+            animation: appear 1s ease-in-out 3s forwards;
+        }
+        .branch4 { /* Rama superior */
+            width: 120px;
+            height: 50px;
+            animation: appear 1s ease-in-out 4s forwards;
+        }
+        /* Adornos (bolas, posicionados relativos al árbol) */
+        .ornament {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            opacity: 0;
+            animation: appear 1s ease-in-out 5s forwards;
+        }
+        .ornament1 { background: #FF0000; bottom: 70px; left: 40%; } /* Rojo */
+        .ornament2 { background: #FFD700; bottom: 120px; right: 35%; } /* Dorado */
+        .ornament3 { background: #0000FF; bottom: 170px; left: 45%; } /* Azul */
+        .ornament4 { background: #FF69B4; bottom: 220px; right: 40%; } /* Rosa */
+        /* Luces parpadeantes */
+        .light {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #FFD700;
+            border-radius: 50%;
+            opacity: 0;
+            animation: appear 1s ease-in-out 5s forwards, blink 1.5s infinite 6s;
+        }
+        .light1 { bottom: 80px; left: 50%; }
+        .light2 { bottom: 130px; right: 45%; }
+        .light3 { bottom: 180px; left: 50%; }
+        .light4 { bottom: 230px; right: 50%; }
+        /* Estrella del árbol */
+        .star {
+            font-size: 2em;
+            opacity: 0;
+            animation: appear 1s ease-in-out 6s forwards, twinkle 1s infinite 7s;
+        }
+        /* Estrellas twinkling (aparecen y desaparecen) */
+        .twinkling-star {
+            position: absolute;
+            font-size: 1.5em;
+            color: #FFD700; /* Dorado */
+            opacity: 0;
+            animation: twinkle-random 3s infinite;
+        }
+        .twinkling-star:nth-child(1) { top: 10%; left: 20%; animation-delay: 0s; }
+        .twinkling-star:nth-child(2) { top: 15%; right: 25%; animation-delay: 0.5s; }
+        .twinkling-star:nth-child(3) { top: 30%; left: 70%; animation-delay: 1s; }
+        .twinkling-star:nth-child(4) { top: 40%; right: 10%; animation-delay: 1.5s; }
+        .twinkling-star:nth-child(5) { top: 50%; left: 80%; animation-delay: 2s; }
+        .twinkling-star:nth-child(6) { top: 60%; right: 60%; animation-delay: 2.5s; }
+        .twinkling-star:nth-child(7) { top: 70%; left: 30%; animation-delay: 3s; }
+        .twinkling-star:nth-child(8) { top: 80%; right: 40%; animation-delay: 3.5s; }
+        .twinkling-star:nth-child(9) { top: 90%; left: 50%; animation-delay: 4s; }
+        .twinkling-star:nth-child(10) { top: 20%; right: 80%; animation-delay: 4.5s; }
+        @keyframes appear {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        @keyframes twinkle {
+            0% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        @keyframes twinkle-random {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 3em;
+            color: #FFFFFF; /* Blanco */
+            animation: blink 2s infinite;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.5em;
+            margin: 10px 0;
+        }
+        .message {
+            font-size: 1.2em;
+            margin-top: 30px;
+            line-height: 1.6;
+            transition: text-shadow 0.3s;
+        }
+        .message:hover {
+            text-shadow: 0 0 10px #FFD700; /* Brillo dorado al hover */
+        }
+        /* Cuadro para la foto */
+        .photo-frame {
+            margin-top: 30px;
+            display: inline-block;
+            border: 5px solid #FFD700; /* Borde dorado */
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); /* Sombra dorada */
+            transition: box-shadow 0.3s;
+        }
+        .photo-frame:hover {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); /* Brillo al hover */
+        }
+        .photo-frame img {
+            width: 300px;
+            height: auto;
+            border-radius: 5px;
+            display: block;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.5; }
+        }
+        /* Árbolitos navideños (dibujados con CSS) */
+        .tree {
+            position: absolute;
+            width: 50px;
+            height: 70px;
+            background: linear-gradient(to bottom, #228B22, #006400); /* Verde */
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            animation: sway 3s ease-in-out infinite;
+        }
+        .tree::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid #FFD700; /* Estrella dorada */
+        }
+        .tree1 { top: 10%; left: 5%; }
+        .tree2 { top: 20%; right: 5%; }
+        .tree3 { bottom: 10%; left: 10%; }
+        .tree4 { bottom: 20%; right: 10%; }
+        @keyframes sway {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(5deg); }
+        }
+        /* Renos (usando emoji, animados) */
+        .reindeer {
+            position: absolute;
+            font-size: 2em;
+            animation: move 8s linear infinite;
+        }
+        .reindeer1 { top: 30%; left: -10%; }
+        .reindeer2 { top: 50%; right: -10%; animation-delay: 4s; }
+        @keyframes move {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 50px)); }
+        }
+        /* Nieve cayendo (más copos) */
+        .snow {
+            position: absolute;
+            top: -10px;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: fall 10s linear infinite;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+        /* Generar nieve aleatoria */
+        .snow:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .snow:nth-child(2) { left: 20%; animation-delay: 1s; }
+        .snow:nth-child(3) { left: 30%; animation-delay: 2s; }
+        .snow:nth-child(4) { left: 40%; animation-delay: 3s; }
+        .snow:nth-child(5) { left: 50%; animation-delay: 4s; }
+        .snow:nth-child(6) { left: 60%; animation-delay: 5s; }
+        .snow:nth-child(7) { left: 70%; animation-delay: 6s; }
+        .snow:nth-child(8) { left: 80%; animation-delay: 7s; }
+        .snow:nth-child(9) { left: 90%; animation-delay: 8s; }
+        .snow:nth-child(10) { left: 15%; animation-delay: 9s; }
+        /* Responsividad */
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            p { font-size: 1.2em; }
+            .message { font-size: 1em; }
+            .tree { width: 30px; height: 40px; }
+            .reindeer { font-size: 1.5em; }
+            .snow { width: 5px; height: 5px; }
+            .background-tree { width: 150px; height: 225px; } /* Árbol más pequeño en móviles */
+            .branch1 { width: 135px; height: 60px; }
+            .branch2 { width: 120px; height: 52px; }
+            .branch3 { width: 105px; height: 45px; }
+            .branch4 { width: 90px; height: 37px; }
+            .ornament { width: 10px; height: 10px; }
+            .light { width: 5px; height: 5px; }
+            .twinkling-star { font-size: 1em; } /* Estrellas más pequeñas en móviles */
+            .photo-frame img { width: 250px; } /* Foto más pequeña en móviles */
+        }
+    </style>
+</head>
+<body>
+    <!-- Estrellas twinkling -->
+    <div class="twinkling-star">⭐</div>
+    <div class="twinkling-star">⭐</div>
+    <div class="twinkling-star">⭐</div>
+    <div class="twinkling-star">⭐</div>
+    <div class="twinkling-star">⭐</div>
+    <div class="twinkling-star">⭐</div>
+    <div class="twinkling-star">⭐</div>
+    <div class="twinkling-star">⭐</div>
+    <div class="twinkling-star">⭐</div>
+    <div class="twinkling-star">⭐</div>
+    
+    <!-- Árbol de fondo dinámico (construcción) -->
+    <div class="background-tree">
+        <div class="star">⭐</div>
+        <div class="branch branch4"></div>
+        <div class="branch branch3"></div>
+        <div class="branch branch2"></div>
+        <div class="branch branch1"></div>
+        <div class="trunk"></div>
+        <div class="ornament ornament1"></div>
+        <div class="ornament ornament2"></div>
+        <div class="ornament ornament3"></div>
+        <div class="ornament ornament4"></div>
+        <div class="light light1"></div>
+        <div class="light light2"></div>
+        <div class="light light3"></div>
+        <div class="light light4"></div>
+    </div>
+    
+    <!-- Árbolitos decorativos -->
+    <div class="tree tree1"></div>
+    <div class="tree tree2"></div>
+    <div class="tree tree3"></div>
+    <div class="tree tree4"></div>
+    
+    <!-- Renos animados -->
+    <!--<div class="reindeer reindeer1">🦌</div>
+    <div class="reindeer reindeer2">🦌</div> -->
+
+    <div class="container">
+        <h1>Feliz Navidad</h1>
+
+
+        <p>Para : Ximena Antonia Medrano Enrriquez</p>
+        <p class="message">Feliz Navidad, espero que hoy tengas un dia tranquilo y hermoso, que la pases bien en familia y acompañada de tus seres queridos. Espero que la estes pasando hermoso, un abarazo a la distancia. Te deseo paz y buen augurio. Posdata me los felicitas de mi parte a tu ma. ¡Felices fiestas!</p>
+        
+                    <!-- Cuadro para la foto -->
+        <div class="photo-frame">
+            <img src="IMG-20251105-WA0261.jpg" alt="Foto especial de Navidad">
+        </div>
+        <p>Con cariño<br>Felix Daniel</p>
+        
+
+    </div>
+    
+    <!-- Nieve cayendo (más copos para dinamismo) -->
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+</body>
+</html>
